@@ -1,4 +1,4 @@
-package server;
+package shared;
 
 public class ByteArrayContainer {
 	private byte[] byte_array;

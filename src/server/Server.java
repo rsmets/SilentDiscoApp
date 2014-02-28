@@ -4,6 +4,8 @@ import java.util.concurrent.BlockingQueue;
 
 import javax.sound.sampled.*;
 
+import shared.ByteArrayContainer;
+
 public class Server implements Runnable{
 
 	   private DataLine.Info outInfo;
@@ -12,7 +14,11 @@ public class Server implements Runnable{
 	   private SourceDataLine outputLine;
 	   private AudioFormat format;
 	   private byte[] sendData = new byte[1024];
-	   private boolean send_flag = false;
+	   private int port;
+	   private DatagramSocket serverSocket;
+	   private DatagramPacket sendPacket;
+	   private DatagramPacket receivePacket;
+	   private InetAddress IPAddress;
 	   final BlockingQueue<ByteArrayContainer> audioQ;
 
 	   public Server(BlockingQueue<ByteArrayContainer> queue){
@@ -51,7 +57,7 @@ public class Server implements Runnable{
 	         while(true){  
 	           //just play the audio in audioQ
 	           buffer = audioQ.take().getPrimative();
-	           System.out.println("server: just grabbed audio");
+	           //System.out.println("server: just grabbed audio");
 	           outputLine.write(buffer, 0, buffer.length);
 	           
 	         }
@@ -72,45 +78,54 @@ public class Server implements Runnable{
 	    }
 	   }
 
-	   public void send_over_network() throws Exception{
-	      //setting up socket
-	      DatagramSocket serverSocket = new DatagramSocket(9876);
-	   
-	      //setting up temporary data holders
-	      byte[] receiveData = new byte[1024];
-	      //byte[] sendData = new byte[1024];
-
-	      //while(true){
-	      while(send_flag){
-	         //setting up packet to receive data and receiving data
-	         DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
-	         serverSocket.receive(receivePacket);
-
-	         //converting received packet's data to a different data type
-	         String sentence = new String( receivePacket.getData());
-
-	         //doing something with data received
-	         System.out.println("RECEIVED: " + sentence);
-
-	         //grabbing IPaddress and port that the client was talking from
-	         InetAddress IPAddress = receivePacket.getAddress();
-	         int port = receivePacket.getPort();
-
-	         //doing something with data before sending
-	         String capitalizedSentence = sentence.toUpperCase();
-	         sendData = capitalizedSentence.getBytes();
+	   public void send_to_client() throws Exception{
+		 
+		  //setting up socket
+		  serverSocket = new DatagramSocket(9876);
+		  
+		  //Initialize connection
+		  clientWelcome();
+		   
+	      while(true){	    	  
+	         //grab audio to send from queue
+	         sendData = audioQ.take().getPrimative();
 	         
-
 	         //setting up packet to send and sending
-	         DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress, port);
+	         sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress, port);
 	         serverSocket.send(sendPacket);
-	         send_flag = false;
+	         //send_flag = false;
 	      }
 	   }
+	   
+	private void clientWelcome() throws Exception{
+		
+		  //setting up temporary data holders
+		  byte[] recievedData = new byte[1024];
+		  
+	      //setting up packet to receive data and receiving data
+	      receivePacket = new DatagramPacket(recievedData, recievedData.length);
+	      serverSocket.receive(receivePacket);
+	      System.out.println("Recieved from a client: " + receivePacket.getData());
+
+	      //grabbing IPaddress and port that the client was talking from
+	      IPAddress = receivePacket.getAddress();
+	      port = receivePacket.getPort();
+	      
+	      //sending welcome message
+	      String welcome = new String("You've successfully connected to the server");
+	      sendPacket = new DatagramPacket(welcome.getBytes(), welcome.getBytes().length, IPAddress, port);
+	      serverSocket.send(sendPacket);
+	}
 
 	@Override
 	public void run() {
 		//playAudio();
+		try {
+			send_to_client();
+		} catch (Exception e) {
+			System.out.println("something went wrong sending audio");
+			e.printStackTrace();
+		}
 	}
 
 }

@@ -7,6 +7,8 @@ import javax.sound.sampled.DataLine;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.TargetDataLine;
 
+import shared.ByteArrayContainer;
+
 public class AudioGrabber implements Runnable{
 	   private DataLine.Info inInfo;
 	   private int bufferSize;
@@ -66,11 +68,11 @@ public class AudioGrabber implements Runnable{
 	         //listening to linein
 	         while(true){
 	           int sample = inputLine.read(buffer,0,buffer.length);
-	           System.out.println("read sample size of: " + sample);
+	           //System.out.println("read sample size of: " + sample);
 
 	           //add to queue for Server to grab from and send
 	           audioQ.offer(new ByteArrayContainer(buffer));
-	           System.out.println("audioGrabber: just offered audio");
+	           //System.out.println("audioGrabber: just offered audio");
 	           
 	         }
 	      } catch (LineUnavailableException ex) {

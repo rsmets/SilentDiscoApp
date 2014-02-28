@@ -2,6 +2,8 @@ package server;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+
+import shared.ByteArrayContainer;
  
 public class Main {
 	
