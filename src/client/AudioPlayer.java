@@ -24,10 +24,12 @@ public class AudioPlayer implements Runnable{
 	
 	private void setup(){
 		//make format depending on input audio type
-	    format = new AudioFormat(8000, 16, 1, true, true);   
+	    format = new AudioFormat(44100, 16, 1, true, true);   
 	    outInfo = new DataLine.Info(SourceDataLine.class, format);
 	    bufferSize = (int) format.getSampleRate() * format.getFrameSize();
-	    //bufferSize = bufferSize / 16; //8000/16 = 500
+	    //bufferSize = bufferSize / 16; //8000*2/16 = 1000
+	    //Why does it sound so much better when the bufferSize is large here
+	    //then in the AudioGrabber??
 	}
 	
 	public void playAudio(){

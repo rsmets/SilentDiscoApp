@@ -80,7 +80,7 @@ public class Client implements Runnable{
         InetAddress address = InetAddress.getByName("230.0.0.1");
         socket.joinGroup(address);
         
-        byte[] receiveData = new byte[1024];
+        byte[] receiveData = new byte[5512]; //1000 for server data size (from the AudioGrabber bufferSize)
         
         while(true){
         	//setting up packet for received data

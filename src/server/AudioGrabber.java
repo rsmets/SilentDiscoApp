@@ -32,23 +32,16 @@ public class AudioGrabber implements Runnable{
 
 	private void setup(){
 	    //make format depending on input audio type
-	    format = new AudioFormat(8000, 16, 1, true, true); 
+	    format = new AudioFormat(44100, 16, 1, true, true); 
 	    lines = AudioSystem.getMixerInfo();    
 	    inInfo = new DataLine.Info(TargetDataLine.class, format);
 	    bufferSize = (int) format.getSampleRate() * format.getFrameSize();
-	    bufferSize = bufferSize / 16; //8000/16 = 500
-	    printLineInfo();
+	    bufferSize = bufferSize / 16; //8000*2/16 = 1000
+	    printAudioInfo();
 	   }
 
 	   public void getAudio(){
-	      /*
-	      The Mixer interface provides methods for 
-	      obtaining a mixer's lines. These include 
-	      target lines, to which the mixer delivers its mixed audio.  
-	      The source lines are input ports such as the microphone input, and the target lines are 
-	      TargetDataLines, which deliver audio to the application program.
-	      */
-
+		   
 	      //grabing audio form line-in port
 	      //if (AudioSystem.isLineSupported(Port.Info.LINE_IN)) {
 	      if (!AudioSystem.isLineSupported(inInfo)) {
@@ -67,7 +60,7 @@ public class AudioGrabber implements Runnable{
 
 	         //listening to linein
 	         while(true){
-	           int sample = inputLine.read(buffer,0,buffer.length);
+	           inputLine.read(buffer,0,buffer.length);
 	           //System.out.println("read sample size of: " + sample);
 
 	           //add to queue for Server to grab from and send
@@ -85,11 +78,12 @@ public class AudioGrabber implements Runnable{
 
 	   }
 
-	   public void printLineInfo(){
-	    //for (int i = 0; i < lines.length; i++){
-	    //  System.out.println(i+": "+lines[i].getName()+"\n"+lines[i].getDescription());
-	    //}
+	   public void printAudioInfo(){
+
 		   System.out.println("audio format encoding " + format.getEncoding());
+		   System.out.println("frame size: " + format.getFrameSize());
+		   System.out.println("frame rate: " + format.getFrameRate());
+		   System.out.println("frame rate * frame size = bufferSize = " + bufferSize);
 	   }
 
 	@Override

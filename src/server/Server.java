@@ -120,7 +120,7 @@ public class Server implements Runnable{
 	
 	private void sendMulticast() throws Exception{
 		
-		byte[] buf = new byte[1024];
+		byte[] buf = new byte[5512]; //1000 for the AudioGrabber bufferSize;
 		MulticastSocket socket = new MulticastSocket(4447);
 		InetAddress group = InetAddress.getByName("230.0.0.1");
 		
