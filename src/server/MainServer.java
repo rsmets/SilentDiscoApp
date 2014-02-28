@@ -5,7 +5,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 import shared.ByteArrayContainer;
  
-public class Main {
+public class MainServer {
 	
 	public static void main(String[] args) {
 

@@ -5,9 +5,10 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 import shared.ByteArrayContainer;
 
-public class Main {
+public class MainClient {
 
-	public Main() {
+	public static void main(String[] args) {
+		
 		BlockingQueue<ByteArrayContainer> audioQ = 
 				new LinkedBlockingQueue<ByteArrayContainer>(100);
 	

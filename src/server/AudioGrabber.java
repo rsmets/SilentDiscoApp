@@ -32,12 +32,12 @@ public class AudioGrabber implements Runnable{
 
 	private void setup(){
 	    //make format depending on input audio type
-	    format = new AudioFormat(8000, 8, 1, true, true); 
+	    format = new AudioFormat(8000, 16, 1, true, true); 
 	    lines = AudioSystem.getMixerInfo();    
 	    inInfo = new DataLine.Info(TargetDataLine.class, format);
 	    bufferSize = (int) format.getSampleRate() * format.getFrameSize();
 	    bufferSize = bufferSize / 16; //8000/16 = 500
-	    //printLineInfo();
+	    printLineInfo();
 	   }
 
 	   public void getAudio(){
@@ -86,13 +86,15 @@ public class AudioGrabber implements Runnable{
 	   }
 
 	   public void printLineInfo(){
-	    for (int i = 0; i < lines.length; i++){
-	      System.out.println(i+": "+lines[i].getName()+"\n"+lines[i].getDescription());
-	    }
+	    //for (int i = 0; i < lines.length; i++){
+	    //  System.out.println(i+": "+lines[i].getName()+"\n"+lines[i].getDescription());
+	    //}
+		   System.out.println("audio format encoding " + format.getEncoding());
 	   }
 
 	@Override
 	public void run() {
+		System.out.println("grabber starting");
 		getAudio();
 	}
 }

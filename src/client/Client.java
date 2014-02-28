@@ -74,10 +74,31 @@ public class Client implements Runnable{
 	      //clientSocket.close();
 	      
 	   }
+	
+	private void receiveMulticast() throws Exception{
+		MulticastSocket socket = new MulticastSocket(4446);
+        InetAddress address = InetAddress.getByName("230.0.0.1");
+        socket.joinGroup(address);
+        
+        byte[] receiveData = new byte[1024];
+        
+        while(true){
+        	//setting up packet for received data
+        	receivePacket = new DatagramPacket(receiveData, receiveData.length);
+        	
+        	socket.receive(receivePacket);
+        	audioQ.offer(new ByteArrayContainer(receivePacket.getData()));
+        	//System.out.println("recieved: " + receivePacket.getData());
+        	//if exit condition
+            //socket.leaveGroup(address);
+            //socket.close();
+        }
+	}
 
 	@Override
 	public void run() {
-		setup();
+		System.out.println("client starting");
+		/*setup();
 		try {
 			establishConnnection();
 		} catch (Exception e) {
@@ -86,6 +107,12 @@ public class Client implements Runnable{
 		}
 		try {
 			receive_from_server();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}*/
+		try {
+			receiveMulticast();
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

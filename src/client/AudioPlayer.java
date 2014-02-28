@@ -7,7 +7,6 @@ import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.DataLine;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.SourceDataLine;
-
 import shared.ByteArrayContainer;
 
 public class AudioPlayer implements Runnable{
@@ -16,10 +15,19 @@ public class AudioPlayer implements Runnable{
 	private AudioFormat format;
 	private DataLine.Info outInfo;
 	final BlockingQueue<ByteArrayContainer> audioQ;
+	private int bufferSize;
 	
 	public AudioPlayer(BlockingQueue<ByteArrayContainer> queue) {
-		// TODO Auto-generated constructor stub
+		this.setup();
 		audioQ = queue;
+	}
+	
+	private void setup(){
+		//make format depending on input audio type
+	    format = new AudioFormat(8000, 16, 1, true, true);   
+	    outInfo = new DataLine.Info(SourceDataLine.class, format);
+	    bufferSize = (int) format.getSampleRate() * format.getFrameSize();
+	    //bufferSize = bufferSize / 16; //8000/16 = 500
 	}
 	
 	public void playAudio(){
@@ -28,7 +36,6 @@ public class AudioPlayer implements Runnable{
 	         outputLine.open(format);
 	         outputLine.start();
 
-	         int bufferSize = 500; //TODO need to change this to be dynamically set
 	         byte[] buffer = new byte[bufferSize];
 
 	         while(true){  
@@ -51,7 +58,7 @@ public class AudioPlayer implements Runnable{
 
 	@Override
 	public void run() {
-		// TODO Auto-generated method stub
+		System.out.println("player starting");
 		playAudio();
 	}
 

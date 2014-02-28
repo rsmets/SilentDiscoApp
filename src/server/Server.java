@@ -1,4 +1,5 @@
 package server;
+import java.io.IOException;
 import java.net.*;
 import java.util.concurrent.BlockingQueue;
 
@@ -116,14 +117,36 @@ public class Server implements Runnable{
 	      sendPacket = new DatagramPacket(welcome.getBytes(), welcome.getBytes().length, IPAddress, port);
 	      serverSocket.send(sendPacket);
 	}
+	
+	private void sendMulticast() throws Exception{
+		
+		byte[] buf = new byte[1024];
+		MulticastSocket socket = new MulticastSocket(4447);
+		InetAddress group = InetAddress.getByName("230.0.0.1");
+		
+		// send it
+		while(true){
+			buf = audioQ.take().getPrimative();
+			DatagramPacket packet = new DatagramPacket(buf, buf.length, group, 4446);
+			socket.send(packet);
+		}
+		
+	}
 
 	@Override
 	public void run() {
+		System.out.println("server starting");
 		//playAudio();
-		try {
+		/*try {
 			send_to_client();
 		} catch (Exception e) {
 			System.out.println("something went wrong sending audio");
+			e.printStackTrace();
+		}*/
+		try {
+			sendMulticast();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
