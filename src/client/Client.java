@@ -3,6 +3,7 @@ import java.io.IOException;
 import java.net.*;
 import java.util.concurrent.BlockingQueue;
 
+import server.AudioGrabber;
 import shared.ByteArrayContainer;
 
 public class Client implements Runnable{
@@ -80,7 +81,7 @@ public class Client implements Runnable{
         InetAddress address = InetAddress.getByName("230.0.0.1");
         socket.joinGroup(address);
         
-        byte[] receiveData = new byte[5512]; //1000 for server data size (from the AudioGrabber bufferSize)
+        byte[] receiveData = new byte[AudioGrabber.bufferSize]; //1000 for server data size (from the AudioGrabber bufferSize)
         
         while(true){
         	//setting up packet for received data

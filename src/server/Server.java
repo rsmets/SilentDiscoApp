@@ -5,6 +5,7 @@ import java.util.concurrent.BlockingQueue;
 
 import javax.sound.sampled.*;
 
+import client.AudioPlayer;
 import shared.ByteArrayContainer;
 
 public class Server implements Runnable{
@@ -21,6 +22,7 @@ public class Server implements Runnable{
 	   private DatagramPacket receivePacket;
 	   private InetAddress IPAddress;
 	   final BlockingQueue<ByteArrayContainer> audioQ;
+	   private static AudioFormat.Encoding ULAW;
 
 	   public Server(BlockingQueue<ByteArrayContainer> queue){
 		  audioQ = queue;
@@ -37,11 +39,12 @@ public class Server implements Runnable{
 
 	   private void setup(){
 	      //make format depending on input audio type
-	    format = new AudioFormat(8000, 8, 1, true, true); 
-	    lines = AudioSystem.getMixerInfo();    
+	    format = new AudioFormat(AudioPlayer.sampleRate, AudioPlayer.sampleSizeInBits, 1, true, true); 
+		//format = new AudioFormat(ULAW, AudioPlayer.sampleRate, AudioPlayer.sampleSizeInBits, 1, 1, AudioPlayer.sampleFrameRate, true);
+		lines = AudioSystem.getMixerInfo();    
 	    outInfo = new DataLine.Info(SourceDataLine.class, format);
 	    bufferSize = (int) format.getSampleRate() * format.getFrameSize();
-	    bufferSize = bufferSize / 16; //8000/16 = 500
+	    bufferSize = bufferSize / 16; //44100*2/16 = 5512
 	    //printLineInfo();
 	   }
 
@@ -51,7 +54,7 @@ public class Server implements Runnable{
 	         outputLine.open(format);
 	         outputLine.start();
 
-	         byte[] buffer = new byte[bufferSize];
+	         byte[] buffer = new byte[AudioGrabber.bufferSize];
 
 	         System.out.println("Listening on line " + lines[1].getName() + "...");
 
@@ -120,7 +123,7 @@ public class Server implements Runnable{
 	
 	private void sendMulticast() throws Exception{
 		
-		byte[] buf = new byte[5512]; //1000 for the AudioGrabber bufferSize;
+		byte[] buf = new byte[bufferSize]; //1000 for the AudioGrabber bufferSize;
 		MulticastSocket socket = new MulticastSocket(4447);
 		InetAddress group = InetAddress.getByName("230.0.0.1");
 		

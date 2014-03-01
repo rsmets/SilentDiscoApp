@@ -1,25 +1,33 @@
 package server;
 import java.util.concurrent.BlockingQueue;
 
+import javax.sound.sampled.AudioFileFormat.Type;
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.DataLine;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.TargetDataLine;
 
+import client.AudioPlayer;
 import shared.ByteArrayContainer;
 
 public class AudioGrabber implements Runnable{
 	   private DataLine.Info inInfo;
-	   private int bufferSize;
+	   public static int bufferSize;
 	   private javax.sound.sampled.Mixer.Info[] lines;
 	   private TargetDataLine inputLine;
 	   private AudioFormat format;
 	   final BlockingQueue<ByteArrayContainer> audioQ;
+	   private Type[] types;
+	   private static AudioFormat.Encoding ULAW;
 
 	public AudioGrabber(BlockingQueue<ByteArrayContainer> queue) {
 		audioQ = queue;
 		this.setup();
+		types = (Type[]) AudioSystem.getAudioFileTypes();
+		for(int i = 0; i < types.length; i++)
+			System.out.println(i+ " " + types[i]);
+
 	}
 	
 	@SuppressWarnings("unused")
@@ -32,11 +40,12 @@ public class AudioGrabber implements Runnable{
 
 	private void setup(){
 	    //make format depending on input audio type
-	    format = new AudioFormat(44100, 16, 1, true, true); 
-	    lines = AudioSystem.getMixerInfo();    
+	    format = new AudioFormat(AudioPlayer.sampleRate, AudioPlayer.sampleSizeInBits, 1, true, true); 
+	    //format = new AudioFormat(ULAW, AudioPlayer.sampleRate, AudioPlayer.sampleSizeInBits, 1, 1, AudioPlayer.sampleFrameRate, true);
+		lines = AudioSystem.getMixerInfo();    
 	    inInfo = new DataLine.Info(TargetDataLine.class, format);
 	    bufferSize = (int) format.getSampleRate() * format.getFrameSize();
-	    bufferSize = bufferSize / 16; //8000*2/16 = 1000
+	    bufferSize = bufferSize / 16; //44100*2/16 = 5512
 	    printAudioInfo();
 	   }
 
@@ -84,6 +93,7 @@ public class AudioGrabber implements Runnable{
 		   System.out.println("frame size: " + format.getFrameSize());
 		   System.out.println("frame rate: " + format.getFrameRate());
 		   System.out.println("frame rate * frame size = bufferSize = " + bufferSize);
+		   System.out.println("sample rate: " + format.getSampleRate());
 	   }
 
 	@Override
