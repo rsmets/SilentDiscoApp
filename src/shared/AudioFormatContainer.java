@@ -15,7 +15,7 @@ public class AudioFormatContainer {
 		//maybe in the future allow them to be dynamic
 		
 		sampleRate = 44100.0F;
-		sampleSizeInBits = 16; 
+		sampleSizeInBits = 8; 
 		channels = 1; 
 		signed = true;
 		bigEndian = true;

@@ -56,7 +56,7 @@ public class Client implements Runnable{
 	    System.out.println("From server: " + receivePacket.getData());
 	}
 	
-	@SuppressWarnings("unused")
+	@SuppressWarnings("unused") //DO NOT USE
 	private void receive_from_server() throws IOException{ //not used due to Multicasting now
 		
 		  byte[] receiveData = new byte[1024];
@@ -67,10 +67,11 @@ public class Client implements Runnable{
 	      //receive data
 	      while(true){
 	      clientSocket.receive(receivePacket);
-
+	        String received = new String(receivePacket.getData(), 0, receivePacket.getLength());
+	        System.out.println("Quote of the Moment: " + received);
 	      //doing something recieved packet
 	      System.out.println("recieved data from server");
-	      audioQ.offer(new ByteArrayContainer(receivePacket.getData()));
+	      //audioQ.offer(new ByteArrayContainer(receivePacket.getData()));
 
 	      }
 	      //clientSocket.close();
@@ -82,7 +83,7 @@ public class Client implements Runnable{
         InetAddress address = InetAddress.getByName("230.0.0.1");
         socket.joinGroup(address);
         
-        byte[] receiveData = new byte[AudioGrabber.bufferSize]; //1000 for server data size (from the AudioGrabber bufferSize)
+        byte[] receiveData = new byte[1000]; //1000 for server data size (from the AudioGrabber bufferSize)
         
         while(true){
         	//setting up packet for received data
@@ -90,6 +91,11 @@ public class Client implements Runnable{
         	
         	socket.receive(receivePacket);
         	audioQ.offer(new ByteArrayContainer(receivePacket.getData()));
+        	/*
+            socket.receive(receivePacket);
+	        String received = new String(receivePacket.getData(), 0, receivePacket.getLength());
+	        System.out.println("Quote of the Moment: " + received);
+        	*/
         	//System.out.println("recieved: " + receivePacket.getData());
         	//if exit condition
             //socket.leaveGroup(address);
