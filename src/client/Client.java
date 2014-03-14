@@ -18,12 +18,12 @@ public class Client implements Runnable{
 		audioQ = queue;
 	}
 	
-	private void setup(){
+	@SuppressWarnings("unused")
+	private void setup(){ //not used due to Multicasting now
 		//setting up socket
 	    try {
 			clientSocket = new DatagramSocket();
 		} catch (SocketException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -31,12 +31,12 @@ public class Client implements Runnable{
 	    try {
 			IPAddress = InetAddress.getByName("localhost");
 		} catch (UnknownHostException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
 
-	private void establishConnnection() throws Exception{
+	@SuppressWarnings("unused")
+	private void establishConnnection() throws Exception{ //not used due to Multicasting now
 		
 		byte[] sendData = new byte[1024];
 		byte[] receiveData = new byte[1024];
@@ -56,7 +56,8 @@ public class Client implements Runnable{
 	    System.out.println("From server: " + receivePacket.getData());
 	}
 	
-	private void receive_from_server() throws IOException{
+	@SuppressWarnings("unused")
+	private void receive_from_server() throws IOException{ //not used due to Multicasting now
 		
 		  byte[] receiveData = new byte[1024];
 		
@@ -115,7 +116,7 @@ public class Client implements Runnable{
 		try {
 			receiveMulticast();
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
+
 			e.printStackTrace();
 		}
 		

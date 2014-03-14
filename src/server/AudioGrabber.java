@@ -8,7 +8,7 @@ import javax.sound.sampled.DataLine;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.TargetDataLine;
 
-import client.AudioPlayer;
+import shared.AudioFormatContainer;
 import shared.ByteArrayContainer;
 
 public class AudioGrabber implements Runnable{
@@ -19,7 +19,7 @@ public class AudioGrabber implements Runnable{
 	   private AudioFormat format;
 	   final BlockingQueue<ByteArrayContainer> audioQ;
 	   private Type[] types;
-	   private static AudioFormat.Encoding ULAW;
+	   //private static AudioFormat.Encoding ULAW;
 
 	public AudioGrabber(BlockingQueue<ByteArrayContainer> queue) {
 		audioQ = queue;
@@ -40,8 +40,9 @@ public class AudioGrabber implements Runnable{
 
 	private void setup(){
 	    //make format depending on input audio type
-	    format = new AudioFormat(AudioPlayer.sampleRate, AudioPlayer.sampleSizeInBits, 1, true, true); 
+		format = new AudioFormatContainer().getAudioFormat();
 	    //format = new AudioFormat(ULAW, AudioPlayer.sampleRate, AudioPlayer.sampleSizeInBits, 1, 1, AudioPlayer.sampleFrameRate, true);
+		
 		lines = AudioSystem.getMixerInfo();    
 	    inInfo = new DataLine.Info(TargetDataLine.class, format);
 	    bufferSize = (int) format.getSampleRate() * format.getFrameSize();

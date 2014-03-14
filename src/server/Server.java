@@ -1,11 +1,10 @@
 package server;
-import java.io.IOException;
 import java.net.*;
 import java.util.concurrent.BlockingQueue;
 
 import javax.sound.sampled.*;
 
-import client.AudioPlayer;
+import shared.AudioFormatContainer;
 import shared.ByteArrayContainer;
 
 public class Server implements Runnable{
@@ -22,33 +21,35 @@ public class Server implements Runnable{
 	   private DatagramPacket receivePacket;
 	   private InetAddress IPAddress;
 	   final BlockingQueue<ByteArrayContainer> audioQ;
-	   private static AudioFormat.Encoding ULAW;
+	   //private static AudioFormat.Encoding ULAW;
 
 	   public Server(BlockingQueue<ByteArrayContainer> queue){
 		  audioQ = queue;
 	      this.setup();
 	   }
 	   
-	   @SuppressWarnings("unused")
-	private void examineBytes(ByteArrayContainer holder){
+	@SuppressWarnings("unused")
+	private void examineBytes(ByteArrayContainer holder){ //FOR DEBUGGING
 			byte[] test = holder.getPrimative();
 			System.out.println("server: test[1]: " + test[1]);
 			//test[1] = 1;
 			System.out.println("server2: test[1]: " + test[1]);
 		}
 
-	   private void setup(){
-	      //make format depending on input audio type
-	    format = new AudioFormat(AudioPlayer.sampleRate, AudioPlayer.sampleSizeInBits, 1, true, true); 
+	 private void setup(){
+	    //make format depending on input audio type
+		format = new AudioFormatContainer().getAudioFormat();
 		//format = new AudioFormat(ULAW, AudioPlayer.sampleRate, AudioPlayer.sampleSizeInBits, 1, 1, AudioPlayer.sampleFrameRate, true);
-		lines = AudioSystem.getMixerInfo();    
-	    outInfo = new DataLine.Info(SourceDataLine.class, format);
+		
+		lines = AudioSystem.getMixerInfo(); //for printLineInfo debugging
+	    outInfo = new DataLine.Info(SourceDataLine.class, format); //for playaudio debugging
+	    
 	    bufferSize = (int) format.getSampleRate() * format.getFrameSize();
 	    bufferSize = bufferSize / 16; //44100*2/16 = 5512
 	    //printLineInfo();
 	   }
 
-	   public void playAudio(){
+	 public void playAudio(){ //FOR DEBUGGING
 	      try {
 	         outputLine = (SourceDataLine)AudioSystem.getLine(outInfo);
 	         outputLine.open(format);
@@ -76,13 +77,13 @@ public class Server implements Runnable{
 
 	   }
 
-	   public void printLineInfo(){
+	 public void printLineInfo(){ //FOR DEBUGGING
 	    for (int i = 0; i < lines.length; i++){
 	      System.out.println(i+": "+lines[i].getName()+"\n"+lines[i].getDescription());
 	    }
 	   }
 
-	   public void send_to_client() throws Exception{
+	 public void send_to_client() throws Exception{
 		 
 		  //setting up socket
 		  serverSocket = new DatagramSocket(9876);
@@ -101,7 +102,7 @@ public class Server implements Runnable{
 	      }
 	   }
 	   
-	private void clientWelcome() throws Exception{
+	private void clientWelcome() throws Exception{ //not used now Multicasting
 		
 		  //setting up temporary data holders
 		  byte[] recievedData = new byte[1024];
@@ -149,7 +150,6 @@ public class Server implements Runnable{
 		try {
 			sendMulticast();
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
