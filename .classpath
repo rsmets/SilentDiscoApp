@@ -7,5 +7,6 @@
 	<classpathentry kind="lib" path="/Users/raysmets/Downloads/Beads/library/jl1.0.1.jar"/>
 	<classpathentry kind="lib" path="/Users/raysmets/Downloads/Beads/library/mp3spi1.9.4.jar"/>
 	<classpathentry kind="lib" path="/Users/raysmets/Downloads/Beads/library/tritonus_share.jar"/>
+	<classpathentry kind="lib" path="/Users/raysmets/git/SilentDisco/SilentDisco/lib/xuggle-xuggler-5.4.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -1,5 +1,6 @@
 package client;
 
+import java.util.Date;
 import java.util.concurrent.BlockingQueue;
 
 import javax.sound.sampled.AudioFormat;
@@ -51,11 +52,15 @@ public class AudioPlayer implements Runnable{
 	         outputLine.start();
 
 	         byte[] buffer = new byte[bufferSize];
-
+	         ByteArrayContainer byteContainer;
+	        
 	         while(true){  
 	           //just play the audio in audioQ
-	           buffer = audioQ.take().getPrimative();
-	           System.out.println("client: just grabbed audio");
+	           byteContainer = audioQ.take();
+	           buffer = byteContainer.getPrimative();
+	           
+	           System.out.print("client: just grabbed audio with delay from creation of " );
+	           System.out.println((new Date().getTime() - byteContainer.getTimeCreated()));
 	           outputLine.write(buffer, 0, buffer.length);
 	           
 	         }

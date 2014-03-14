@@ -4,6 +4,7 @@ import java.net.*;
 import java.util.concurrent.BlockingQueue;
 
 import shared.ByteArrayContainer;
+import shared.RTPpacket;
 
 public class Client implements Runnable{
 
@@ -26,13 +27,22 @@ public class Client implements Runnable{
         	//setting up packet for received data
         	receivePacket = new DatagramPacket(receiveData, receiveData.length);
         	
+        	//recieve the rtp packet from server
         	socket.receive(receivePacket);
-        	audioQ.offer(new ByteArrayContainer(receivePacket.getData()));
-        	/*
-            socket.receive(receivePacket);
-	        String received = new String(receivePacket.getData(), 0, receivePacket.getLength());
-	        System.out.println("Quote of the Moment: " + received);
-        	*/
+        	
+        	//create an RTPpacket object
+        	RTPpacket rtp_packet = new RTPpacket(receivePacket.getData(), receivePacket.getLength());
+        	
+        	//get the payload bitstream from the RTPpacket object
+        	int payload_length = rtp_packet.getpayload_length();
+        	byte [] payload = new byte[payload_length];
+        	rtp_packet.getpayload(payload);
+        	
+        	//FOR DEBUGGING
+        	System.out.println("SeqNum recieved: " + rtp_packet.getsequencenumber());
+        	
+        	audioQ.offer(new ByteArrayContainer(payload));
+
         	//System.out.println("recieved: " + receivePacket.getData());
         	//if exit condition
             //socket.leaveGroup(address);

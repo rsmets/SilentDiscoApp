@@ -7,6 +7,7 @@ import javax.sound.sampled.*;
 import net.beadsproject.beads.core.AudioContext;
 import shared.AudioFormatContainer;
 import shared.ByteArrayContainer;
+import shared.RTPpacket;
 
 public class Server implements Runnable{
 
@@ -90,10 +91,22 @@ public class Server implements Runnable{
 		InetAddress group = InetAddress.getByName("230.0.0.1");
 		
 		// send it
+		int seqNum = 0;
 		while(true){
 			buf = audioQ.take().getPrimative();
+			//Builds an RTPpacket object containing the frame
+			RTPpacket rtp_packet = new RTPpacket(seqNum, buf, buf.length);
+			seqNum++;
+			//get to total length of the full rtp packet to send
+			int packet_length = rtp_packet.getlength();
 
-			DatagramPacket packet = new DatagramPacket(buf, buf.length, group, 4446);
+			//retrieve the packet bitstream and store it in an array of bytes
+			byte[] packet_bits = new byte[packet_length];
+			rtp_packet.getpacket(packet_bits);
+
+			//send the packet as a DatagramPacket over the UDP socket 
+			DatagramPacket packet = new DatagramPacket(packet_bits, packet_length, group, 4446);	
+			
 			socket.send(packet);
 		}
 		
@@ -102,10 +115,10 @@ public class Server implements Runnable{
 	@Override
 	public void run() {
 		System.out.println("server starting");
-		playAudio();
+		//playAudio();
 
 		try {
-		//	sendMulticast();
+			sendMulticast();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

@@ -14,7 +14,7 @@ public class AudioFormatContainer {
 		//making the values static for now
 		//maybe in the future allow them to be dynamic
 		
-		sampleRate = 44100.0F;
+		sampleRate = 8000.0F;
 		sampleSizeInBits = 8; 
 		channels = 1; 
 		signed = true;
