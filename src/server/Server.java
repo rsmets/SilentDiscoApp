@@ -14,12 +14,6 @@ public class Server implements Runnable{
 	   private javax.sound.sampled.Mixer.Info[] lines;
 	   private SourceDataLine outputLine;
 	   private AudioFormat format;
-	   private byte[] sendData = new byte[1024];
-	   private int port;
-	   private DatagramSocket serverSocket;
-	   private DatagramPacket sendPacket;
-	   private DatagramPacket receivePacket;
-	   private InetAddress IPAddress;
 	   final BlockingQueue<ByteArrayContainer> audioQ;
 	   //private static AudioFormat.Encoding ULAW;
 
@@ -82,45 +76,6 @@ public class Server implements Runnable{
 	      System.out.println(i+": "+lines[i].getName()+"\n"+lines[i].getDescription());
 	    }
 	   }
-
-	 public void send_to_client() throws Exception{
-		 
-		  //setting up socket
-		  serverSocket = new DatagramSocket(9876);
-		  
-		  //Initialize connection
-		  clientWelcome();
-		   
-	      while(true){	    	  
-	         //grab audio to send from queue
-	         sendData = audioQ.take().getPrimative();
-	         
-	         //setting up packet to send and sending
-	         sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress, port);
-	         serverSocket.send(sendPacket);
-	         //send_flag = false;
-	      }
-	   }
-	   
-	private void clientWelcome() throws Exception{ //not used now Multicasting
-		
-		  //setting up temporary data holders
-		  byte[] recievedData = new byte[1024];
-		  
-	      //setting up packet to receive data and receiving data
-	      receivePacket = new DatagramPacket(recievedData, recievedData.length);
-	      serverSocket.receive(receivePacket);
-	      System.out.println("Recieved from a client: " + receivePacket.getData());
-
-	      //grabbing IPaddress and port that the client was talking from
-	      IPAddress = receivePacket.getAddress();
-	      port = receivePacket.getPort();
-	      
-	      //sending welcome message
-	      String welcome = new String("You've successfully connected to the server");
-	      sendPacket = new DatagramPacket(welcome.getBytes(), welcome.getBytes().length, IPAddress, port);
-	      serverSocket.send(sendPacket);
-	}
 	
 	private void sendMulticast() throws Exception{
 		
@@ -128,13 +83,10 @@ public class Server implements Runnable{
 		MulticastSocket socket = new MulticastSocket(4447);
 		InetAddress group = InetAddress.getByName("230.0.0.1");
 		
-		int i = 0;
 		// send it
 		while(true){
 			buf = audioQ.take().getPrimative();
-			/*String dString = "hi" + i;
-			i++;
-			buf = dString.getBytes();*/
+
 			DatagramPacket packet = new DatagramPacket(buf, buf.length, group, 4446);
 			socket.send(packet);
 		}
@@ -144,15 +96,10 @@ public class Server implements Runnable{
 	@Override
 	public void run() {
 		System.out.println("server starting");
-		//playAudio();
-		/*try {
-			send_to_client();
-		} catch (Exception e) {
-			System.out.println("something went wrong sending audio");
-			e.printStackTrace();
-		}*/
+		playAudio();
+
 		try {
-			sendMulticast();
+		//	sendMulticast();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

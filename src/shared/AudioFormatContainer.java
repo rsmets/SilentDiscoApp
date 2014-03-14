@@ -28,5 +28,9 @@ public class AudioFormatContainer {
 				signed, 
 				bigEndian);
 	}
+	
+	public int getBufferSize(){
+		return 512;//2700;
+	}
 
 }

@@ -8,6 +8,7 @@ import javax.sound.sampled.DataLine;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.TargetDataLine;
 
+import net.beadsproject.beads.core.AudioContext;
 import shared.AudioFormatContainer;
 import shared.ByteArrayContainer;
 
@@ -20,6 +21,7 @@ public class AudioGrabber implements Runnable{
 	   final BlockingQueue<ByteArrayContainer> audioQ;
 	   private Type[] types;
 	   //private static AudioFormat.Encoding ULAW;
+	   AudioContext audioContext;
 
 	public AudioGrabber(BlockingQueue<ByteArrayContainer> queue) {
 		audioQ = queue;
@@ -40,13 +42,19 @@ public class AudioGrabber implements Runnable{
 
 	private void setup(){
 	    //make format depending on input audio type
-		format = new AudioFormatContainer().getAudioFormat();
+		AudioFormatContainer AFC = new AudioFormatContainer();
+		format = AFC.getAudioFormat();
 	    //format = new AudioFormat(ULAW, AudioPlayer.sampleRate, AudioPlayer.sampleSizeInBits, 1, 1, AudioPlayer.sampleFrameRate, true);
+		
+		//converting ot audioContext to handle audio details
+		audioContext = new AudioContext(format); 
+		System.out.println("AC buff size: " + audioContext.getBufferSize());
 		
 		lines = AudioSystem.getMixerInfo();    
 	    inInfo = new DataLine.Info(TargetDataLine.class, format);
 	    bufferSize = (int) format.getSampleRate() * format.getFrameSize();
 	    bufferSize = bufferSize / 16; //44100*2/16 = 5512
+	    bufferSize = AFC.getBufferSize();
 	    printAudioInfo();
 	   }
 
