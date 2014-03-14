@@ -9,7 +9,6 @@ import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.SourceDataLine;
 
 import net.beadsproject.beads.core.AudioContext;
-import server.AudioGrabber;
 import shared.AudioFormatContainer;
 import shared.ByteArrayContainer;
 
@@ -39,7 +38,7 @@ public class AudioPlayer implements Runnable{
 		
 	    outInfo = new DataLine.Info(SourceDataLine.class, format);
 	    bufferSize = (int) format.getSampleRate() * format.getFrameSize();
-	    bufferSize = AFC.getBufferSize();
+	    bufferSize = audioContext.getBufferSize();
 	    //bufferSize = bufferSize / 16; //8000*2/16 = 1000
 	    //Why does it sound so much better when the bufferSize is large here
 	    //then in the AudioGrabber??
@@ -51,7 +50,7 @@ public class AudioPlayer implements Runnable{
 	         outputLine.open(format);
 	         outputLine.start();
 
-	         byte[] buffer = new byte[AudioGrabber.bufferSize];
+	         byte[] buffer = new byte[bufferSize];
 
 	         while(true){  
 	           //just play the audio in audioQ

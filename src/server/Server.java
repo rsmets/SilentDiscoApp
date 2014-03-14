@@ -4,6 +4,7 @@ import java.util.concurrent.BlockingQueue;
 
 import javax.sound.sampled.*;
 
+import net.beadsproject.beads.core.AudioContext;
 import shared.AudioFormatContainer;
 import shared.ByteArrayContainer;
 
@@ -16,6 +17,7 @@ public class Server implements Runnable{
 	   private AudioFormat format;
 	   final BlockingQueue<ByteArrayContainer> audioQ;
 	   //private static AudioFormat.Encoding ULAW;
+	   private AudioContext audioContext;
 
 	   public Server(BlockingQueue<ByteArrayContainer> queue){
 		  audioQ = queue;
@@ -35,11 +37,15 @@ public class Server implements Runnable{
 		format = new AudioFormatContainer().getAudioFormat();
 		//format = new AudioFormat(ULAW, AudioPlayer.sampleRate, AudioPlayer.sampleSizeInBits, 1, 1, AudioPlayer.sampleFrameRate, true);
 		
+		//converting ot audioContext to handle audio details
+	    audioContext = new AudioContext(format); //MAY NOT NEED THIS HERE
+		
 		lines = AudioSystem.getMixerInfo(); //for printLineInfo debugging
 	    outInfo = new DataLine.Info(SourceDataLine.class, format); //for playaudio debugging
 	    
 	    bufferSize = (int) format.getSampleRate() * format.getFrameSize();
 	    bufferSize = bufferSize / 16; //44100*2/16 = 5512
+	    bufferSize = audioContext.getBufferSize();
 	    //printLineInfo();
 	   }
 

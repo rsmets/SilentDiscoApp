@@ -3,6 +3,7 @@ import java.util.concurrent.BlockingQueue;
 
 import javax.sound.sampled.AudioFileFormat.Type;
 import javax.sound.sampled.AudioFormat;
+import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.DataLine;
 import javax.sound.sampled.LineUnavailableException;
@@ -20,6 +21,7 @@ public class AudioGrabber implements Runnable{
 	   private AudioFormat format;
 	   final BlockingQueue<ByteArrayContainer> audioQ;
 	   private Type[] types;
+	   private AudioInputStream audioStream;
 	   //private static AudioFormat.Encoding ULAW;
 	   AudioContext audioContext;
 
@@ -54,7 +56,7 @@ public class AudioGrabber implements Runnable{
 	    inInfo = new DataLine.Info(TargetDataLine.class, format);
 	    bufferSize = (int) format.getSampleRate() * format.getFrameSize();
 	    bufferSize = bufferSize / 16; //44100*2/16 = 5512
-	    bufferSize = AFC.getBufferSize();
+	    bufferSize = audioContext.getBufferSize();
 	    printAudioInfo();
 	   }
 
@@ -69,6 +71,11 @@ public class AudioGrabber implements Runnable{
 	      try {
 	         //inputLine = (TargetDataLine)AudioSystem.getLine(Port.Info.LINE_IN);
 	         inputLine = (TargetDataLine)AudioSystem.getMixer(lines[1]).getLine(inInfo);
+	         
+	         //converting to AudioInputStream
+	         audioStream = new AudioInputStream(inputLine);
+	         
+	         //doing it the raw byte way
 	         inputLine.open(format, bufferSize);
 	         inputLine.start(); 
 
@@ -78,7 +85,12 @@ public class AudioGrabber implements Runnable{
 
 	         //listening to linein
 	         while(true){
-	           inputLine.read(buffer,0,buffer.length);
+	           
+	           //reading bytes of audio stream
+	           audioStream.read(buffer);	 
+	        	 
+	           //reading raw bytes	 
+	           //inputLine.read(buffer,0,buffer.length);
 	           //System.out.println("read sample size of: " + sample);
 
 	           //add to queue for Server to grab from and send
