@@ -72,8 +72,9 @@ public class AudioGrabber implements Runnable{
 	         //inputLine = (TargetDataLine)AudioSystem.getLine(Port.Info.LINE_IN);
 	         inputLine = (TargetDataLine)AudioSystem.getMixer(lines[1]).getLine(inInfo);
 	         
-	         //converting to AudioInputStream
+	         //converting from lineIn to AudioInputStream
 	         audioStream = new AudioInputStream(inputLine);
+	        
 	         
 	         //doing it the raw byte way
 	         inputLine.open(format, bufferSize);
@@ -113,7 +114,7 @@ public class AudioGrabber implements Runnable{
 		   System.out.println("audio format encoding " + format.getEncoding());
 		   System.out.println("frame size: " + format.getFrameSize());
 		   System.out.println("frame rate: " + format.getFrameRate());
-		   System.out.println("frame rate * frame size = bufferSize = " + bufferSize);
+		   System.out.println("bufferSize = " + bufferSize);
 		   System.out.println("sample rate: " + format.getSampleRate());
 	   }
 

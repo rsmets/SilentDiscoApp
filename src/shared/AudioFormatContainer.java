@@ -9,6 +9,7 @@ public class AudioFormatContainer {
 	private int channels; //1 for mono. 2 for stereo.
 	private boolean signed = true;
 	private boolean bigEndian = true;
+	//private static AudioFormat.Encoding ULAW;
 	
 	public AudioFormatContainer() {
 		//making the values static for now

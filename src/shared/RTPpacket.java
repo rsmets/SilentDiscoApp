@@ -3,7 +3,7 @@ package shared;
 public class RTPpacket{
 
 //size of the RTP header:
-static int HEADER_SIZE = 11;
+static int HEADER_SIZE = 2;
 
 //Fields that compose the RTP header
 public int SequenceNumber;
@@ -39,6 +39,7 @@ public RTPpacket(int seqNum, byte[] data, int data_length){
   //fill the header array of byte with RTP header fields
 
   header[0] = (byte)SequenceNumber;
+  header[1] = (byte)0;
 
 
   //fill the payload bitstream:
