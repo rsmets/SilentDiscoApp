@@ -13,6 +13,7 @@ public class Client implements Runnable{
 
 	private DatagramPacket receivePacket;
 	final BlockingQueue<ByteArrayContainer> audioQ;
+	int lastSeqNum;
 	
 	public Client(BlockingQueue<ByteArrayContainer> queue){
 		audioQ = queue;
@@ -27,6 +28,9 @@ public class Client implements Runnable{
     	
     	//create an RTPpacket object
     	RTPpacket rtp_packet = new RTPpacket(receivePacket.getData(), receivePacket.getLength());
+    	
+    	//set first seqNum to lastSeqNum have reference for determine to drop packets later 
+    	lastSeqNum = rtp_packet.SequenceNumber;
     	
     	AudioFormatContainer audioFC;
     	if(rtp_packet.Encoding == 0){ //if default mic audio
@@ -71,11 +75,11 @@ public class Client implements Runnable{
         	int seqNum = rtp_packet.getsequencenumber();
         	System.out.println("SeqNum recieved: " + seqNum);
         	
-        	//if(seqNum )
-        	audioQ.offer(new ByteArrayContainer(payload));
-
-        	//System.out.println("recieved: " + receivePacket.getData());
-        	//if exit condition
+        	if(seqNum > lastSeqNum) //will drop packet -128 after 127 (1/256)... that's acceptable
+        		audioQ.offer(new ByteArrayContainer(payload));
+        	lastSeqNum = seqNum;
+        	
+        	//if exit condition NO EXIT CONDITION IMPLEMENTED
             //socket.leaveGroup(address);
             //socket.close();
         }
