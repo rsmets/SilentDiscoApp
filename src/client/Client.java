@@ -54,7 +54,7 @@ public class Client implements Runnable{
         byte[] receiveData = new byte[525]; //1000 for server data size (from the AudioGrabber bufferSize)
         
         //figure out what audio format to use from header
-        determineAudioFormat(receiveData, socket);
+        //determineAudioFormat(receiveData, socket);
         
         while(true){
         	//setting up packet for received data
@@ -75,9 +75,9 @@ public class Client implements Runnable{
         	int seqNum = rtp_packet.getsequencenumber();
         	System.out.println("SeqNum recieved: " + seqNum);
         	
-        	if(seqNum > lastSeqNum) //will drop packet -128 after 127 (1/256)... that's acceptable
+        	//if(seqNum > lastSeqNum) //will drop packet -128 after 127 (1/256)... that's acceptable
         		audioQ.offer(new ByteArrayContainer(payload));
-        	lastSeqNum = seqNum;
+        	//lastSeqNum = seqNum;
         	
         	//if exit condition NO EXIT CONDITION IMPLEMENTED
             //socket.leaveGroup(address);

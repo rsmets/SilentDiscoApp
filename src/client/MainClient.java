@@ -28,10 +28,10 @@ public class MainClient {
     
 		//would use below audioPlayer and start its thread if knew type of audio before hand
 		//it would decrease delay but doing this later allows for dynamic audio formats.
-		//AudioPlayer audioPlayer = new AudioPlayer(audioQ);
+		AudioPlayer audioPlayer = new AudioPlayer(audioQ);
 		
 		new Thread(client).start();
-		//new Thread(audioPlayer).start();
+		new Thread(audioPlayer).start();
 	}
 
 }
