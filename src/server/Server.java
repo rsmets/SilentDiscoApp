@@ -19,23 +19,26 @@ public class Server implements Runnable{
 	   final BlockingQueue<ByteArrayContainer> audioQ;
 	   //private static AudioFormat.Encoding ULAW;
 	   private AudioContext audioContext;
+	   final AudioFormatContainer audioFC;
 
-	   public Server(BlockingQueue<ByteArrayContainer> queue){
+	   public Server(BlockingQueue<ByteArrayContainer> queue, 
+			   AudioFormatContainer audioFormatContainer){
 		  audioQ = queue;
-	      this.setup();
+		  audioFC = audioFormatContainer;
+		  
+		  this.setup();
 	   }
 	   
 	@SuppressWarnings("unused")
 	private void examineBytes(ByteArrayContainer holder){ //FOR DEBUGGING
 			byte[] test = holder.getPrimative();
 			System.out.println("server: test[1]: " + test[1]);
-			//test[1] = 1;
-			System.out.println("server2: test[1]: " + test[1]);
+			
 		}
 
 	 private void setup(){
 	    //make format depending on input audio type
-		format = new AudioFormatContainer().getAudioFormat();
+		format = audioFC.getAudioFormat();
 		//format = new AudioFormat(ULAW, AudioPlayer.sampleRate, AudioPlayer.sampleSizeInBits, 1, 1, AudioPlayer.sampleFrameRate, true);
 		
 		//converting ot audioContext to handle audio details
@@ -49,6 +52,7 @@ public class Server implements Runnable{
 	    bufferSize = audioContext.getBufferSize();
 	    //printLineInfo();
 	   }
+	 
 
 	 public void playAudio(){ //FOR DEBUGGING
 	      try {
@@ -83,7 +87,7 @@ public class Server implements Runnable{
 	      System.out.println(i+": "+lines[i].getName()+"\n"+lines[i].getDescription());
 	    }
 	   }
-	
+	 
 	private void sendMulticast() throws Exception{
 		
 		byte[] buf = new byte[bufferSize]; //1000 for the AudioGrabber bufferSize;
@@ -95,7 +99,9 @@ public class Server implements Runnable{
 		while(true){
 			buf = audioQ.take().getPrimative();
 			//Builds an RTPpacket object containing the frame
-			RTPpacket rtp_packet = new RTPpacket(seqNum, buf, buf.length);
+			RTPpacket rtp_packet = new RTPpacket(seqNum, audioFC.mp3, 
+					audioFC.sampleRate, audioFC.sampleSizeInBits,
+					audioFC.channels, buf, buf.length);
 			seqNum++;
 			//get to total length of the full rtp packet to send
 			int packet_length = rtp_packet.getlength();

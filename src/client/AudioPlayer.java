@@ -1,5 +1,8 @@
 package client;
 
+import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.util.Date;
 import java.util.concurrent.BlockingQueue;
 
@@ -9,6 +12,8 @@ import javax.sound.sampled.DataLine;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.SourceDataLine;
 
+import javazoom.jl.decoder.JavaLayerException;
+import javazoom.jl.player.Player;
 import net.beadsproject.beads.core.AudioContext;
 import shared.AudioFormatContainer;
 import shared.ByteArrayContainer;
@@ -19,30 +24,37 @@ public class AudioPlayer implements Runnable{
 	private AudioFormat format;
 	private DataLine.Info outInfo;
 	final BlockingQueue<ByteArrayContainer> audioQ;
+	final AudioFormatContainer audioFC;
 	int bufferSize;
 	AudioContext audioContext;
 	//private static AudioFormat.Encoding ULAW;
 	
-	public AudioPlayer(BlockingQueue<ByteArrayContainer> queue) {
-		this.setup();
+	public AudioPlayer(BlockingQueue<ByteArrayContainer> queue, AudioFormatContainer AFC) {
+		audioFC = AFC;
 		audioQ = queue;
+		this.setup();
+	}
+	
+	public AudioPlayer(BlockingQueue<ByteArrayContainer> queue) {
+		audioFC = new AudioFormatContainer();
+		audioQ = queue;
+		this.setup();
 	}
 	
 	private void setup(){
-		//make format depending on input audio type
-		AudioFormatContainer AFC = new AudioFormatContainer();
-		format = AFC.getAudioFormat();
-		//format = new AudioFormat(ULAW, sampleRate, sampleSizeInBits, 1, 1, sampleRate, true);
+		//for getting MixerFormat
+		//AudioFormatContainer AFC = new AudioFormatContainer();
+		//format = AFC.getAudioFormat();
+		//outInfo = new DataLine.Info(SourceDataLine.class, format);
+		
+		//for getting FileFormat
+		format = audioFC.getAudioFormat();
+		outInfo = new DataLine.Info(SourceDataLine.class, format);
 		
 		//converting to audioContext to handle audio details
-		audioContext = new AudioContext(format); 
-		
-	    outInfo = new DataLine.Info(SourceDataLine.class, format);
-	    bufferSize = (int) format.getSampleRate() * format.getFrameSize();
+		audioContext = new AudioContext(format);
 	    bufferSize = audioContext.getBufferSize();
-	    //bufferSize = bufferSize / 16; //8000*2/16 = 1000
-	    //Why does it sound so much better when the bufferSize is large here
-	    //then in the AudioGrabber??
+
 	}
 	
 	public void playAudio(){
@@ -53,7 +65,7 @@ public class AudioPlayer implements Runnable{
 
 	         byte[] buffer = new byte[bufferSize];
 	         ByteArrayContainer byteContainer;
-	        
+	         
 	         while(true){  
 	           //just play the audio in audioQ
 	           byteContainer = audioQ.take();
@@ -75,10 +87,52 @@ public class AudioPlayer implements Runnable{
 
 	   }
 
+	//never used...
+	public void playMp3() throws InterruptedException {
+        //String song = "http://www.ntonyx.com/mp3files/Morning_Flower.mp3";
+        Player mp3player = null;
+        BufferedInputStream in = null;
+        
+        byte[] buffer = new byte[bufferSize];
+        ByteArrayContainer byteContainer;
+        
+        while(true){
+        byteContainer = audioQ.take();
+
+        buffer = byteContainer.getPrimative();
+        
+        InputStream is = new ByteArrayInputStream(buffer);
+        
+        
+          in = new BufferedInputStream(is);
+          try {
+        	  
+			mp3player = new Player(in);
+			mp3player.play();
+			
+			
+		} catch (JavaLayerException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        }
+         
+
+}
+	
 	@Override
 	public void run() {
 		System.out.println("player starting");
 		playAudio();
+		
+		/* Used when tinkering with sending and playing MP3s... never finished.
+		 * try {
+			playMp3();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}*/
+		
 	}
 
 }

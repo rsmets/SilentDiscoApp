@@ -3,10 +3,16 @@ package shared;
 public class RTPpacket{
 
 //size of the RTP header:
-static int HEADER_SIZE = 2;
+static int HEADER_SIZE = 5;
 
 //Fields that compose the RTP header
 public int SequenceNumber;
+public int Encoding;
+public float sampleRate;
+public int sampleSizeInBits;
+public int channels;
+//public int signed;
+//public int bigEndian;
 
 //Bitstream of the RTP header
 public byte[] header;
@@ -21,26 +27,30 @@ public byte[] payload;
 //--------------------------
 //Constructor of an RTPpacket object from header fields and payload bitstream
 //--------------------------
-public RTPpacket(int seqNum, byte[] data, int data_length){
+public RTPpacket(int seqNum, int fileUsed, float sampleRt, 
+		int sampleSizeBits, int chls, byte[] data, int data_length){
   //fill by default header fields:
-
-
 
   //fill changing header fields:
   SequenceNumber = seqNum;
+  Encoding = fileUsed;
+  sampleRate = sampleRt;
+  sampleSizeInBits = sampleSizeBits;
+  channels = chls;
   
   //build the header bistream:
   //--------------------------
   header = new byte[HEADER_SIZE];
 
-  //.............
-  //TO COMPLETE
-  //.............
   //fill the header array of byte with RTP header fields
 
   header[0] = (byte)SequenceNumber;
-  header[1] = (byte)0;
-
+  header[1] = (byte)Encoding;
+  header[2] = (byte)sampleRate;
+  header[3] = (byte)sampleSizeInBits;
+  header[4] = (byte)channels;
+  //header[5] = headerInfo[5]; //(byte)signed;
+  //header[6] = headerInfo[6]; //(byte)bigEndian;
 
   //fill the payload bitstream:
   //--------------------------
@@ -49,8 +59,6 @@ public RTPpacket(int seqNum, byte[] data, int data_length){
 
   //fill payload array of byte from data (given in parameter of the constructor)
   payload = data;
-
-  // ! Do not forget to uncomment method printheader() below !
 
 }
   
